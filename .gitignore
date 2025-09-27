@@ -1,0 +1,9 @@
+# Arquivos de cahe do Python
+__pycache__/
+*.pyc
+ 
+
+#Configurações locais
+
+.env
+

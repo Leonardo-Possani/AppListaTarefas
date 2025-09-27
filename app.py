@@ -1,48 +1,54 @@
-from storage import load_tasks, save_tasks
-from tasks import add_task, list_tasks, complete_task, remove_task
+import tkinter as tk
+import tasks # aqui importamos as funções e a lista
 
-def main():
-    tarefas = load_tasks()  # carrega ao iniciar
+def atualizar_lista():
 
-    while True:
-        print("\n--- Gerenciador de Tarefas ---")
-        print("1. Adicionar tarefa")
-        print("2. Listar tarefas")
-        print("3. Marcar tarefa como concluída")
-        print("4. Remover tarefa")
-        print("0. Sair")
+    # Recarrega ListBox a partir da lista 'Tarefas' em memória
+    lista.delete(0, tk.END) # limpa todos os itens da listbox
+    for i, tarefa in enumerate(tasks.listar(), start=1):               
+        lista.insert(tk.END, f"{i}. {tarefa["nome"]} - {tarefa["status"]}")
+        
+def adicionar_tarefa():
 
-        opcao = input("Escolha uma opção: ")
+    nome = entrada.get().strip()
+    if nome:
+        tasks.adicionar(nome)
+        atualizar_lista()
+        entrada.delete(0, tk.END)
+  
+def remover_tarefa():
 
-        if opcao == "1":
-            nome = input("Digite o nome da tarefa: ")
-            add_task(tarefas, nome)
-            save_tasks(tarefas)
+    selecao = lista.curselection()
+    if selecao:
+        tasks.remover(selecao[0])
+        atualizar_lista()
 
-        elif opcao == "2":
-            list_tasks(tarefas)
+def concluir_tarefa():
 
-        elif opcao == "3":
-            list_tasks(tarefas)
-            numero = int(input("Digite o número da tarefa: ")) - 1
-            if 0 <= numero < len(tarefas):
-                complete_task(tarefas, numero)
-                save_tasks(tarefas)
+    selecao = lista.curselection()
+    if selecao:
+        tasks.concluir(selecao[0])
+        atualizar_lista()
+        
 
-        elif opcao == "4":
-            list_tasks(tarefas)
-            numero = int(input("Digite o número da tarefa: ")) - 1
-            if 0 <= numero < len(tarefas):
-                remove_task(tarefas, numero)
-                save_tasks(tarefas)
+# -------  Interface Gráfica
 
-        elif opcao == "0":
-            print("Saindo...")
-            break
+janela = tk.Tk()
+janela.title("Lista de Tarefas")
 
-        else:
-            print("Opção inválida!")
+entrada = tk.Entry(janela, width=30)
+entrada.pack(pady=10)
 
-if __name__ == "__main__":
-    main()
+tk.Button(janela, text="Adicionar", command=adicionar_tarefa).pack(pady=5)
+tk.Button(janela, text="Concluir", command=concluir_tarefa).pack(pady=5)
+tk.Button(janela, text="Remover", command=remover_tarefa).pack(pady=5)
 
+lista = tk.Listbox(janela, width=50, height=15)
+lista.pack(pady=10)
+
+atualizar_lista()
+
+janela.mainloop()
+
+
+        

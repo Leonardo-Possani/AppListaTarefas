@@ -1,17 +1,21 @@
-def add_task(tarefas, nome):
+from storage import load_tasks, save_tasks
+
+# Carrega os dados na inicialização
+tarefas = load_tasks()
+
+def listar():
+    return tarefas
+
+def adicionar(nome):
     tarefas.append({"nome": nome, "status": "Pendente"})
+    save_tasks(tarefas)
 
-def list_tasks(tarefas):
-    if not tarefas:
-        print("Nenhuma tarefa encontrada.")
-    else:
-        print("\nTarefas:")
-        for i, tarefa in enumerate(tarefas, start=1):
-            print(f"{i}. {tarefa['nome']} - {tarefa['status']}")
-
-def complete_task(tarefas, indice):
+def concluir(indice):
     tarefas[indice]["status"] = "Concluída"
+    save_tasks(tarefas)
 
-def remove_task(tarefas, indice):
-    del tarefas[indice]
-
+def remover(indice):
+    tarefas.pop(indice)
+    save_tasks(tarefas)
+    
+    
