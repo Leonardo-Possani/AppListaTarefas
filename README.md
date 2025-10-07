@@ -1,6 +1,6 @@
 # Lista de Tarefas em Python 📝
 
-Um aplicativo simples de **lista de tarefas** desenvolvido em **Python 3** com interface gráfica em **Tkinter** e armazenamento de dados em **JSON**.  
+Um aplicativo simples de **lista de tarefas** desenvolvido em **Python 3** com interface gráfica em **PySide6** e armazenamento de dados em **JSON**.  
 
 Permite adicionar, remover e marcar tarefas como concluídas, com persistência automática.
 
@@ -9,7 +9,7 @@ Permite adicionar, remover e marcar tarefas como concluídas, com persistência 
 ## 🛠 Tecnologias Utilizadas
 
 - Python 3.13+
-- Tkinter (Interface Gráfica)
+- PySide6 (Interface Gráfica)
 - JSON (Persistência de dados)
 
 ---
@@ -36,7 +36,7 @@ cd lista-tarefas
 ## Arch Linux / WSL Arch:
 
 ```bash
-sudo pacman -S tk
+sudo pacman -S Pyside6
 ```
 ## Ubuntu / WSL Ubuntu:
 ```bash
@@ -53,9 +53,9 @@ python3 app.py
 ```bash
 AppListaTarefas/
 │── app.py        # Interface gráfica
-│── tasks.py      # Lógica de tarefas (adicionar, remover, concluir)
-│── storage.py    # Persistência em JSON (salvar e carregar tarefas)
-│── data.json     # Arquivo de armazenamento das tarefas
+│── tarefas_model.py      # Lógica de tarefas (adicionar, remover, concluir)Persistência em JSON (salvar e carregar tarefas)
+    │── json/
+       │── tarefas.json     # Arquivo de armazenamento das tarefas
 │── README.md     # Documentação do projeto
 ```
 
