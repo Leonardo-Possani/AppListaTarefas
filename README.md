@@ -6,6 +6,8 @@ Permite adicionar, remover e marcar tarefas como concluídas, com persistência 
 
 ---
 
+<img width="747" height="474" alt="ListaDeTarefas" src="https://github.com/user-attachments/assets/50e64ea5-e3b4-41a7-9bf1-51a746a60e6f" />
+
 ## 🛠 Tecnologias Utilizadas
 
 - Python 3.13+
