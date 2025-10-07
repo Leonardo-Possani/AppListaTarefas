@@ -19,7 +19,7 @@ Permite adicionar, remover e marcar tarefas como concluídas, com persistência 
 - Adicionar novas tarefas
 - Marcar tarefas como concluídas
 - Remover tarefas
-- Lista de tarefas armazenada no arquivo `data.json`
+- Lista de tarefas armazenada no arquivo `tarefas.json`
 - Interface gráfica intuitiva
 
 ---
