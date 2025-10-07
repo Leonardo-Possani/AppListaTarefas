@@ -41,7 +41,7 @@ sudo pacman -S Pyside6
 ## Ubuntu / WSL Ubuntu:
 ```bash
 sudo apt update
-sudo apt install python3-tk
+sudo apt install PySide6
 ```
 
 ## Execute o aplicativo:
