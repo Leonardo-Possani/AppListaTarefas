@@ -1,54 +1,149 @@
-import tkinter as tk
-import tasks # aqui importamos as funções e a lista
+import sys
 
-def atualizar_lista():
-
-    # Recarrega ListBox a partir da lista 'Tarefas' em memória
-    lista.delete(0, tk.END) # limpa todos os itens da listbox
-    for i, tarefa in enumerate(tasks.listar(), start=1):               
-        lista.insert(tk.END, f"{i}. {tarefa["nome"]} - {tarefa["status"]}")
+from PySide6.QtWidgets import (
         
-def adicionar_tarefa():
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLineEdit, QListView, QMessageBox
+        
+)
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QStandardItemModel, QStandardItem, QColor
 
-    nome = entrada.get().strip()
-    if nome:
-        tasks.adicionar(nome)
-        atualizar_lista()
-        entrada.delete(0, tk.END)
-  
-def remover_tarefa():
+from tarefas_model import TarefasModel
 
-    selecao = lista.curselection()
-    if selecao:
-        tasks.remover(selecao[0])
-        atualizar_lista()
 
-def concluir_tarefa():
 
-    selecao = lista.curselection()
-    if selecao:
-        tasks.concluir(selecao[0])
-        atualizar_lista()
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        # config Mainwindow (Janela principal)
+        self.setWindowTitle("Lista tarefas")
+        self.setMinimumSize(750,450)
         
 
-# -------  Interface Gráfica
 
-janela = tk.Tk()
-janela.title("Lista de Tarefas")
+        # Modelo de dados
+        self.modelo_dados = TarefasModel()
 
-entrada = tk.Entry(janela, width=30)
-entrada.pack(pady=10)
+        # Modelo visual (para QListView)
+        self.modelo_visual = QStandardItemModel()
 
-tk.Button(janela, text="Adicionar", command=adicionar_tarefa).pack(pady=5)
-tk.Button(janela, text="Concluir", command=concluir_tarefa).pack(pady=5)
-tk.Button(janela, text="Remover", command=remover_tarefa).pack(pady=5)
-
-lista = tk.Listbox(janela, width=50, height=15)
-lista.pack(pady=10)
-
-atualizar_lista()
-
-janela.mainloop()
-
-
+        #  ---- botoes ----
+        self.btn_add = QPushButton("Adicionar")
+        self.btn_edit = QPushButton("Editar")
+        self.btn_remove = QPushButton("Remover")
+        self.btn_done = QPushButton("Concluir / Reabrir")
         
+        # ----- entrada da lista -----
+        self.input_tarefa = QLineEdit()
+        self.input_tarefa.setPlaceholderText("Digite uma nova tarefas")
+    
+        #  ----- Lista -----
+        self.lista  = QListView()
+        self.lista.setModel(self.modelo_visual)
+
+
+        # Layout
+        layout_principal = QVBoxLayout()
+        layout_botoes = QHBoxLayout()       
+        
+        layout_botoes.addWidget(self.btn_add)
+        layout_botoes.addWidget(self.btn_edit)
+        layout_botoes.addWidget(self.btn_remove)
+        layout_botoes.addWidget(self.btn_done)
+              
+        
+        # add widgets / layouts a janela principal
+        layout_principal.addLayout(layout_botoes)
+        layout_principal.addWidget(self.input_tarefa)
+        layout_principal.addWidget(self.lista)
+
+
+        # Container principal
+        container = QWidget()
+        container.setLayout(layout_principal)
+        self.setCentralWidget(container)
+
+
+
+        # Conectar eventos
+    
+        self.btn_add.clicked.connect(self.add_tarefa)
+        self.btn_remove.clicked.connect(self.remove_tarefa)
+        self.btn_done.clicked.connect(self.done_tarefa)
+        self.btn_edit.clicked.connect(self.edit_tarefa)
+    
+        # Carrega as tarefas salvas
+        self.atualizar_lista()
+
+       
+
+
+    # ----- Disparo de eventos -----
+
+    def atualizar_lista(self):
+        # --- Atualiza a QListView com as tarefas ---
+        self.modelo_visual.clear()
+        for tarefa in self.modelo_dados.tarefas:
+            item = QStandardItem(tarefa["texto"])
+            if tarefa["status"] == "concluída":
+                item.setForeground(QColor("gray"))
+                item.setCheckState(Qt.CheckState.Checked)
+            else:
+                item.setForeground(QColor("black"))
+                item.setCheckState(Qt.CheckState.Unchecked)
+            item.setCheckable(True)
+            self.modelo_visual.appendRow(item)
+
+
+    def add_tarefa(self):
+        texto = self.input_tarefa.text().strip()
+        if texto:
+            self.modelo_dados.adicionar_tarefa(texto)
+            self.input_tarefa.clear()
+            self.atualizar_lista()
+        
+        else:
+            QMessageBox.warning(self, "Aviso", "Digite uma tarefa antes de adícionar")
+            
+    def remove_tarefa(self):
+        indice = self.lista.currentIndex().row()
+        if indice >= 0:
+            self.modelo_dados.remover_tarefa(indice)
+            self.atualizar_lista()
+        else:
+            QMessageBox.warning(self, "Aviso", "Selecione uma tarefa para remover.")
+            
+
+    def done_tarefa(self):
+        indice = self.lista.currentIndex().row()
+        if indice >= 0:
+            self.modelo_dados.alternar_status(indice)
+            self.atualizar_lista()
+        else:
+            QMessageBox.warning(self, "Aviso", "Selecione uma tarefa primeiro!")
+ 
+
+    def edit_tarefa(self):
+        indice = self.lista.currentIndex().row()
+        texto = self.input_tarefa.text().strip()
+        if indice >= 0:
+            self.modelo_dados.edit_tarefa(indice, texto)
+            self.atualizar_lista()
+        else:    
+            QMessageBox.warning(self, "Aviso", "Selecione uma tarefa para editar.")
+
+
+
+
+
+
+
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    janela = MainWindow()
+    janela.show()
+    app.exec()
