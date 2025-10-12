@@ -1,5 +1,7 @@
 import json
+from datetime import datetime
 from pathlib import Path
+
 
 class TarefasModel:
     def __init__(self, arquivo_json="tarefas.json"):
@@ -26,7 +28,14 @@ class TarefasModel:
     def adicionar_tarefa(self, texto):
        
        # ---- Adicionar novas tarefas como pendente ----
-        self.tarefas.append({"texto": texto, "status": "pendente"})
+        agora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.tarefas.append({
+            "texto": texto,
+            "status": "Pendente",
+            "criado_em": agora,
+            "concluido_em": None
+                
+        })
         self.salvar_tarefas()
 
     def remover_tarefa(self, indice):
@@ -39,14 +48,18 @@ class TarefasModel:
         # --- marca tarefa como concluida/pendente ---
         if 0 <= indice < len(self.tarefas):
             tarefa = self.tarefas[indice]
-            tarefa["status"] = (
-                    "concluída" if tarefa["status"] == "pendente" else "pendente"
-                    )
-            self.salvar_tarefas()
+            if tarefa["status"] == "Pendente":
+                tarefa["status"] = "Concluída"
+                tarefa["concluido_em"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                tarefa["status"] = "Pendente"
+                tarefa["concluido_em"] = None
+        self.salvar_tarefas()
 
-    def edit_tarefa(self, indice, texto):
+    def edit_tarefa(self, indice, novo_texto):
+        # Atualiza o texto de uma tarefa existente
         if 0 <= indice < len(self.tarefas):
-            self.tarefas[indice]["texto"] = texto.strip()            
+            self.tarefas[indice]["texto"] = novo_texto.strip()
             self.salvar_tarefas()
 
-        
+

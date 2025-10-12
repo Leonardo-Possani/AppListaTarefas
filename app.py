@@ -2,7 +2,7 @@ import sys
 
 from PySide6.QtWidgets import (
         
-    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLineEdit, QListView, QMessageBox
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLineEdit, QListView, QMessageBox, QInputDialog
         
 )
 from PySide6.QtCore import Qt
@@ -40,9 +40,12 @@ class MainWindow(QMainWindow):
         self.input_tarefa.setPlaceholderText("Digite uma nova tarefas")
     
         #  ----- Lista -----
+
+        # Lista principal a esquerda
         self.lista  = QListView()
         self.lista.setModel(self.modelo_visual)
-
+        
+        # Lista 
 
         # Layout
         layout_principal = QVBoxLayout()
@@ -86,15 +89,25 @@ class MainWindow(QMainWindow):
         # --- Atualiza a QListView com as tarefas ---
         self.modelo_visual.clear()
         for tarefa in self.modelo_dados.tarefas:
-            item = QStandardItem(tarefa["texto"])
-            if tarefa["status"] == "concluída":
-                item.setForeground(QColor("gray"))
-                item.setCheckState(Qt.CheckState.Checked)
+            texto = tarefa["texto"]
+            status = tarefa["status"]
+            criado = tarefa["criado_em"]
+            concluido = tarefa["concluido_em"]
+
+            # monta o texto completo da linha
+            if status == "Concluída":
+                texto_final = f"{texto} | ✅  {status.upper()} ({concluido})"
+                cor = "gray"
+            
             else:
-                item.setForeground(QColor("black"))
-                item.setCheckState(Qt.CheckState.Unchecked)
-            item.setCheckable(True)
+                texto_final = f"{texto} | ⏳ {status.upper()} (Criado: {criado})"
+                cor = "black"
+
+
+            item = QStandardItem(texto_final)
+            item.setForeground(QColor(cor))
             self.modelo_visual.appendRow(item)
+
 
 
     def add_tarefa(self):
@@ -127,13 +140,20 @@ class MainWindow(QMainWindow):
 
     def edit_tarefa(self):
         indice = self.lista.currentIndex().row()
-        texto = self.input_tarefa.text().strip()
-        if indice >= 0:
-            self.modelo_dados.edit_tarefa(indice, texto)
-            self.atualizar_lista()
-        else:    
+        if indice < 0:
             QMessageBox.warning(self, "Aviso", "Selecione uma tarefa para editar.")
+            return
+        tarefa_atual = self.modelo_dados.tarefas[indice]["texto"]
 
+        # Abre o diálogo de texto
+
+        novo_texto, ok = QInputDialog.getText(
+               self, "Editar tarefa", "Novo texto", text=tarefa_atual
+               )
+        if ok and novo_texto.strip():
+            # passa o novo texto para o modelo
+            self.modelo_dados.edit_tarefa(indice, novo_texto)
+            self.atualizar_lista()
 
 
 
